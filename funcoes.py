@@ -1,5 +1,15 @@
 import sqlite3
 
+#Função para exibir o menu
+def exibir_menu():
+    print("\nMenu Inicial:")
+    print("1. Cadastrar cliente")
+    print("2. Listar clientes")
+    print("3. Alterar cliente")
+    print("4. Remover cliente")
+    print("5. Buscar cliente")
+    print("0. Sair")
+
 # Função para cadastrar um cliente e opcionalmente seu endereço
 def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None):
     # Validação dos campos obrigatórios

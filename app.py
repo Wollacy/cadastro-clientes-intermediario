@@ -5,13 +5,7 @@ banco.criar_tabelas()
 
 # Menu interativo
 while True:
-    print("\nMenu Inicial:")
-    print("1. Cadastrar cliente")
-    print("2. Listar clientes")
-    print("3. Alterar cliente")
-    print("4. Remover cliente")
-    print("5. Buscar cliente")
-    print("0. Sair")
+    funcoes.exibir_menu()
     opcao = input("Escolha uma opção: ")
 
     if opcao == "1":
