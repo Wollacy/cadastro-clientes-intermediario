@@ -62,3 +62,5 @@ while True:
 
     else:
         print("\nA opção escolhida não existe. Por favor, tente novamente.")
+
+    # Eu analisei e compreendi a estrutura do projeto!
