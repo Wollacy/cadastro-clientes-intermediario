@@ -9,36 +9,14 @@ while True:
     opcao = input("Escolha uma opção: ")
 
     if opcao == "1":
-        print("\nCadastrar Cliente\n")
-        codigo = input("Digite o código do cliente: ")
-        nome = input("Digite o nome do cliente: ")
-        endereco_opcional = input("Deseja cadastrar o endereço? (S/N): ").strip().upper()
-
-        if endereco_opcional == "S":
-            rua = input("Digite o nome da rua: ")
-            numero = input("Digite o número: ")
-            cidade = input("Digite a cidade: ")
-            funcoes.cadastrar_cliente(codigo, nome, rua, numero, cidade)
-        else:
-            funcoes.cadastrar_cliente(codigo, nome)
+        funcoes.fluxo_cadastrar_cliente()
 
     elif opcao == "2":
         print("\nListar Clientes\n")
         funcoes.listar_clientes()
 
     elif opcao == "3":
-        print("\nAlterar Cliente\n")
-        codigo = input("Digite o código do cliente que deseja alterar: ")
-        novo_nome = input("Digite o novo nome do cliente: ")
-        alterar_endereco = input("Deseja alterar o endereço? (S/N): ").strip().upper()
-
-        if alterar_endereco == "S":
-            rua = input("Digite o novo nome da rua: ")
-            numero = input("Digite o novo número: ")
-            cidade = input("Digite a nova cidade: ")
-            funcoes.alterar_cliente(codigo, novo_nome, rua, numero, cidade)
-        else:
-            funcoes.alterar_cliente(codigo, novo_nome)
+        funcoes.fluxo_alterar_cliente()
 
     elif opcao == "4":
         print("\nRemover Cliente\n")
