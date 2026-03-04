@@ -70,10 +70,31 @@ def listar_clientes():
     if not clientes:
         print("Nenhum cliente cadastrado.")
     else:
+        clientes_formatados = []
+        
+        for codigo, nome, rua, numero, cidade in clientes: 
+            cliente = { 
+                "codigo": codigo, 
+                "nome": nome, 
+                "rua": rua, 
+                "numero": numero, 
+                "cidade": cidade 
+            } 
+            clientes_formatados.append(cliente)
+
         print("\nLista de Clientes:")
-        for codigo, nome, rua, numero, cidade in clientes:
-            endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
-            print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
+        for cliente in clientes_formatados:
+            endereco = (
+            f"{cliente['rua']}, {cliente['numero']} - {cliente['cidade']}"
+            if cliente["rua"]
+            else "Sem endereço cadastrado"
+            )
+    
+            print(
+                f"Código: {cliente['codigo']} - "
+                f"Nome: {cliente['nome']} - "
+                f"Endereço: {endereco}"
+            )
 
 def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
     conexao = sqlite3.connect("clientes.db")
