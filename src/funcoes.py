@@ -1,59 +1,32 @@
-from banco import inserir_cliente
 import sqlite3
 
-def exibir_menu(): 
-   print("\nMenu Inicial:") 
-   print("1. Cadastrar cliente") 
-   print("2. Listar clientes") 
-   print("3. Alterar cliente") 
-   print("4. Remover cliente") 
-   print("5. Buscar cliente") 
-   print("0. Sair")
-
-def fluxo_cadastrar_cliente(): 
-   print("\nCadastrar Cliente\n") 
-   codigo = input("Digite o código do cliente: ") 
-   nome = input("Digite o nome do cliente: ") 
-   endereco_opcional = input("Deseja cadastrar o endereço? (S/N): ").strip().upper() 
- 
-   if endereco_opcional == "S": 
-       rua = input("Digite o nome da rua: ") 
-       numero = input("Digite o número: ") 
-       cidade = input("Digite a cidade: ") 
-       cadastrar_cliente(codigo, nome, rua, numero, cidade) 
-   else: 
-       cadastrar_cliente(codigo, nome) 
-
-def fluxo_alterar_cliente(): 
-   print("\nAlterar Cliente\n") 
-   codigo = input("Digite o código do cliente que deseja alterar: ") 
-   novo_nome = input("Digite o novo nome do cliente: ") 
-   alterar_endereco = input("Deseja alterar o endereço? (S/N): ").strip().upper() 
- 
-   if alterar_endereco == "S": 
-       rua = input("Digite o novo nome da rua: ") 
-       numero = input("Digite o novo número: ") 
-       cidade = input("Digite a nova cidade: ") 
-       alterar_cliente(codigo, novo_nome, rua, numero, cidade) 
-   else: 
-       alterar_cliente(codigo, novo_nome) 
-
 # Função para cadastrar um cliente e opcionalmente seu endereço
-def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None): 
- 
-   if not codigo or not codigo.strip(): 
-       print("Erro: O código do cliente não pode estar vazio.") 
-       return 
- 
-   if not nome or not nome.strip(): 
-       print("Erro: O nome do cliente não pode estar vazio.") 
-       return 
- 
-   try: 
-       inserir_cliente(codigo.strip(), nome.strip()) 
-       print(f"Cliente {codigo} - {nome} cadastrado com sucesso!") 
-   except sqlite3.IntegrityError: 
-       print("Erro: Já existe um cliente com esse código.")
+def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None):
+    # Validação dos campos obrigatórios
+    if not codigo or not codigo.strip():
+        print("Erro: O código do cliente não pode estar vazio.")
+        return
+    if not nome or not nome.strip():
+        print("Erro: O nome do cliente não pode estar vazio.")
+        return
+
+    conexao = sqlite3.connect("clientes.db")
+    cursor = conexao.cursor()
+    try:
+        # Insere o cliente na tabela clientes
+        cursor.execute("INSERT INTO clientes (codigo, nome) VALUES (?, ?)", (codigo.strip(), nome.strip()))
+        
+        # Se o endereço for fornecido, insere na tabela enderecos
+        if rua and numero and cidade:
+            cursor.execute("INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)", 
+                           (codigo.strip(), rua.strip(), numero.strip(), cidade.strip()))
+
+        conexao.commit()
+        print(f"Cliente {codigo} - {nome} cadastrado com sucesso!")
+    except sqlite3.IntegrityError:
+        print("Erro: Já existe um cliente com esse código.")
+    finally:
+        conexao.close()
 
 # Função para listar clientes com seus endereços (se houver)
 def listar_clientes():
@@ -70,31 +43,10 @@ def listar_clientes():
     if not clientes:
         print("Nenhum cliente cadastrado.")
     else:
-        clientes_formatados = []
-        
-        for codigo, nome, rua, numero, cidade in clientes: 
-            cliente = { 
-                "codigo": codigo, 
-                "nome": nome, 
-                "rua": rua, 
-                "numero": numero, 
-                "cidade": cidade 
-            } 
-            clientes_formatados.append(cliente)
-
         print("\nLista de Clientes:")
-        for cliente in clientes_formatados:
-            endereco = (
-            f"{cliente['rua']}, {cliente['numero']} - {cliente['cidade']}"
-            if cliente["rua"]
-            else "Sem endereço cadastrado"
-            )
-    
-            print(
-                f"Código: {cliente['codigo']} - "
-                f"Nome: {cliente['nome']} - "
-                f"Endereço: {endereco}"
-            )
+        for codigo, nome, rua, numero, cidade in clientes:
+            endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
+            print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
 
 def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
     conexao = sqlite3.connect("clientes.db")

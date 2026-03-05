@@ -1,10 +1,7 @@
 import sqlite3
 
-def conectar(): 
-    return sqlite3.connect("clientes.db")
-
 def criar_tabelas():
-    conexao = conectar()
+    conexao = sqlite3.connect("clientes.db")
     cursor = conexao.cursor()
 
     # Cria a tabela de clientes
@@ -29,15 +26,3 @@ def criar_tabelas():
 
     conexao.commit()
     conexao.close()
-
-def inserir_cliente(codigo, nome): 
-   conexao = conectar()
-   cursor = conexao.cursor() 
- 
-   cursor.execute( 
-       "INSERT INTO clientes (codigo, nome) VALUES (?, ?)", 
-       (codigo, nome) 
-   ) 
- 
-   conexao.commit() 
-   conexao.close() 
