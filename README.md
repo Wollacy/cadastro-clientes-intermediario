@@ -1,58 +1,46 @@
-﻿# Ebook de Lógica de Programação com Python
+﻿# 🚀 Sistema de Gestão de Clientes (CRUD) - Arquitetura em 3 Camadas 
+ 
+Este é um projeto desenvolvido em Python focado em boas práticas de Engenharia de Software, utilizando Arquitetura em 3 Camadas, Programação Orientada a Objetos (POO) e persistência de dados com SQLite. 
+ 
+## 🎯 O Projeto 
+ 
+O sistema é uma aplicação de terminal interativa que permite gerenciar o cadastro de clientes e seus endereços, garantindo a integridade dos dados e a fácil exportação de relatórios. O maior foco deste projeto não é apenas "fazer funcionar", mas sim demonstrar um código limpo, escalável e de fácil manutenção. 
+ 
+## 🛠️ Tecnologias e Conceitos Aplicados 
+ 
+- **Python 3.10+**: Utilização de recursos modernos como `match/case`. 
+- **SQLite3**: Banco de dados relacional nativo. 
+- **Arquitetura em 3 Camadas**: Separação estrita entre Interface (`main.py`), Regras de Negócio (`funcoes.py`) e Persistência de Dados (`banco.py`). 
+- **Programação Orientada a Objetos (POO)**: Uso da classe `Cliente` para encapsular dados e comportamentos. 
+- **Tratamento de Exceções**: Blocos `try/except/finally` para blindar a aplicação contra falhas de banco de dados e interrupções do usuário. 
+- **Exportação de Dados**: Geração automática de relatórios em formato `.csv` utilizando a biblioteca nativa `csv`. 
+- **Boas Práticas**: Código formatado com *Black Formatter* e proteção de dados sensíveis com `.gitignore`. 
+ 
+## 📁 Estrutura do Projeto 
+ 
+O código foi refatorado para seguir padrões de mercado, abandonando o modelo de script único e adotando pastas modulares: 
+ 
+* `main.py` -> Ponto de entrada e menu interativo. 
+* `/src/funcoes.py` -> Regras de negócio e validações. 
+* `/src/models.py` -> Definição da Classe Cliente. 
+* `/database/banco.py` -> Conexão centralizada e queries SQL. 
+ 
+## 🚀 Como Executar 
+ 
 
-Este repositório contém todo o material e o código desenvolvido no ebook **"Lógica de Programação com Python"**, criado para guiar iniciantes na jornada de aprender o básico de programação de forma prática e didática.
+Clone o repositório: 
+	git clone https://github.com/SEU-USUARIO/cadastro-clientes-intermediario.git 
 
-## 📖 Sobre o Ebook
+ 
 
-No ebook, abordamos os seguintes tópicos:
-- **Conceitos de Lógica de Programação:** Introdução ao pensamento lógico necessário para programar.
-- **Tipos de Dados:** Variáveis, constantes e tipos como strings, inteiros, floats e booleanos.
-- **Estruturas Condicionais e de Repetição:** `if`, `else`, `for`, `while` e suas aplicações.
-- **Versionamento com Git e GitHub:** Como registrar, comitar e versionar suas alterações.
-- **Banco de Dados SQLite:** Para criar uma aplicação CRUD via terminal.
+Acesse a pasta do projeto: 
+	cd cadastro-clientes-intermediario 
+ 
 
-Ao longo do ebook, desenvolvemos uma aplicação prática de cadastro de clientes (CRUD), consolidando os conceitos apresentados.
+Execute o sistema: 
+	python main.py
 
-## 🛠️ Estrutura do Repositório
-
-- **/capitulos:** Contém os arquivos de código organizados por capítulos.
-- **/exemplos:** Códigos de exemplos utilizados no ebook.
-- **/desafios:** Resolução dos desafios propostos ao final de cada capítulo.
-- **/projeto-final:** Código completo da aplicação CRUD desenvolvida no ebook.
-- **README.md:** Este arquivo.
-
-## 🚀 Requisitos para Rodar os Exemplos
-
-- Python 3.10 ou superior
-- Biblioteca SQLite integrada ao Python (já incluída por padrão)
-- Git instalado (para versionamento de código)
-
-## 🔧 Como Rodar
-
-1. Clone este repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/ebook-logica-python.git
-   ```
-2. Acesse o diretório do projeto:
-   ```bash
-   cd ebook-logica-python
-   ```
-3. Execute os arquivos Python diretamente pelo terminal:
-   ```bash
-   python nome_do_arquivo.py
-   ```
-
-## 🌟 Contribua com Este Projeto
-
-Sinta-se à vontade para abrir issues ou criar pull requests para melhorias no conteúdo ou no código.
-
-## 📬 Contato
-
-- Autor: Wollacy Willyan de Carvalho  
+👨‍💻 Autor: Wollacy Willyan de Carvalho
 - E-mail: [carvalho_1990@outlook.com](mailto:carvalho_1990@outlook.com)  
 - LinkedIn: [Wollacy](https://www.linkedin.com/in/wollacycarvalho/)
 - Instagram: [Wollacy](https://www.instagram.com/wollacywcarvalho/)
-
----
-
-Feito com ❤️ e dedicação para facilitar o aprendizado de programação.
