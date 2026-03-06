@@ -49,18 +49,27 @@ def main():
                 funcoes.listar_clientes()
             
             case "3":
-                print("\nAlterar Cliente\n")
-                codigo = input("Digite o código do cliente que deseja alterar: ")
-                novo_nome = input("Digite o novo nome do cliente: ")
+                print("\n[ Alterar Cliente ]")
+                
+                # 1. Montamos o "pacote" (dicionário) base do cliente
+                cliente_alterado = {
+                    "codigo": input("Digite o código do cliente que deseja alterar: ").strip(),
+                    "novo_nome": input("Digite o novo nome do cliente: ").strip(),
+                    "rua": None,
+                    "numero": None,
+                    "cidade": None
+                }
+
                 alterar_endereco = input("Deseja alterar o endereço? (S/N): ").strip().upper()
 
+                # 2. Preenchemos o endereço apenas se o usuário quiser
                 if alterar_endereco == "S":
-                    rua = input("Digite o novo nome da rua: ")
-                    numero = input("Digite o novo número: ")
-                    cidade = input("Digite a nova cidade: ")
-                    funcoes.alterar_cliente(codigo, novo_nome, rua, numero, cidade)
-                else:
-                    funcoes.alterar_cliente(codigo, novo_nome)
+                    cliente_alterado["rua"] = input("Digite o novo nome da rua: ").strip()
+                    cliente_alterado["numero"] = input("Digite o novo número: ").strip()
+                    cliente_alterado["cidade"] = input("Digite a nova cidade: ").strip()
+
+                # 3. Enviamos o dicionário inteiro para a camada de regras!
+                funcoes.alterar_cliente(cliente_alterado)
 
             case "4":
                 print("\nRemover Cliente\n")

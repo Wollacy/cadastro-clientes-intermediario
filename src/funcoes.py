@@ -35,91 +35,59 @@ def listar_clientes():
        endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado" 
        print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
 
-def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
-    conexao = banco.conectar()
-    cursor = conexao.cursor()
-
-    # Buscar o cliente pelo código
-    cursor.execute("SELECT codigo, nome FROM clientes WHERE codigo = ?", (codigo,))
-    cliente = cursor.fetchone()
-
-    if not cliente:
-        print(f"Erro: Cliente com código {codigo} não encontrado.")
-        conexao.close()
+def alterar_cliente(cliente_dict):
+    codigo = cliente_dict["codigo"]
+    
+    # 1. Validação (Regra de negócio principal)
+    if not codigo:
+        print("❌ Erro: O código do cliente é obrigatório para a alteração.")
         return
 
-    cliente_codigo, nome_atual = cliente
+    # 2. Persistência (Envia os dados desempacotados para o banco)
+    sucesso, mensagem = banco.atualizar_cliente(
+        codigo, 
+        cliente_dict["novo_nome"], 
+        cliente_dict["rua"], 
+        cliente_dict["numero"], 
+        cliente_dict["cidade"]
+    )
 
-    # Se o usuário não digitou um novo nome, mantém o nome atual
-    novo_nome = novo_nome.strip() if novo_nome and novo_nome.strip() else nome_atual
-
-    cursor.execute("UPDATE clientes SET nome = ? WHERE codigo = ?", (novo_nome, codigo))
-
-    # Atualizar ou inserir endereço, se fornecido
-    if rua or numero or cidade:
-        cursor.execute("SELECT id FROM enderecos WHERE cliente_codigo = ?", (cliente_codigo,))
-        endereco = cursor.fetchone()
-
-        if endereco:
-            # Atualiza apenas os campos fornecidos
-            cursor.execute("""
-                UPDATE enderecos 
-                SET rua = COALESCE(?, rua), 
-                    numero = COALESCE(?, numero), 
-                    cidade = COALESCE(?, cidade) 
-                WHERE cliente_codigo = ?
-            """, (rua, numero, cidade, cliente_codigo))
-        else:
-            # Insere um novo endereço apenas se todos os campos forem fornecidos
-            if rua and numero and cidade:
-                cursor.execute("""
-                    INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) 
-                    VALUES (?, ?, ?, ?)
-                """, (cliente_codigo, rua, numero, cidade))
-            else:
-                print("Aviso: Para cadastrar um novo endereço, todos os campos (rua, numero, cidade) devem ser fornecidos.")
-
-    conexao.commit()
-    print(f"Cliente {codigo} atualizado para {novo_nome} com sucesso!")
-
-    conexao.close()
+    # 3. Exibição / Interface
+    if sucesso:
+        print(f"✅ Sucesso: {mensagem}")
+    else:
+        print(f"⚠️ Erro: {mensagem}")
 
 # Função para remover um cliente e seu endereço correspondente
 def remover_cliente(codigo):
-    conexao = banco.conectar()
-    cursor = conexao.cursor()
-    
-    # Remover o endereço antes do cliente para evitar erro de integridade
-    cursor.execute("DELETE FROM enderecos WHERE cliente_codigo = ?", (codigo,))
-    cursor.execute("DELETE FROM clientes WHERE codigo = ?", (codigo,))
-    
-    conexao.commit()
+    # 1. Validação (Regra de Negócio)
+    if not codigo.strip():
+        print("❌ Erro: O código do cliente não pode estar vazio.")
+        return
 
-    if cursor.rowcount > 0:
-        print(f"Cliente {codigo} removido com sucesso!")
+    # 2. Persistência (Pede para o banco tentar deletar)
+    sucesso = banco.deletar_cliente(codigo)
+
+    # 3. Exibição / Interface
+    if sucesso:
+        print(f"✅ Cliente {codigo} removido com sucesso!")
     else:
-        print(f"Erro: Cliente com código {codigo} não encontrado.")
+        print(f"⚠️ Erro: Cliente com código {codigo} não encontrado no sistema.")
 
-    conexao.close()
-
-# Função para buscar clientes pelo código ou nome
 def buscar_cliente(termo):
-    conexao = banco.conectar()
-    cursor = conexao.cursor()
-    cursor.execute("""
-        SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 
-        FROM clientes c 
-        LEFT JOIN enderecos e ON c.codigo = e.cliente_codigo
-        WHERE c.codigo = ? OR c.nome LIKE ?
-    """, (termo, f"%{termo}%"))
-    
-    clientes = cursor.fetchall()
-    conexao.close()
+    # 1. Validação
+    if not termo.strip():
+        print("❌ Erro: O termo de busca não pode estar vazio.")
+        return
 
+    # 2. Persistência (Pega os dados crus lá do banco)
+    clientes = banco.buscar_cliente(termo)
+
+    # 3. Exibição / Interface
     if clientes:
-        print("\nClientes encontrados:")
+        print("\n🔍 Clientes encontrados:")
         for codigo, nome, rua, numero, cidade in clientes:
             endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
             print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
     else:
-        print(f"Nenhum cliente encontrado com o termo: {termo}.")
+        print(f"⚠️ Nenhum cliente encontrado com o termo: '{termo}'.")
