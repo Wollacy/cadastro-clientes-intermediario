@@ -35,9 +35,9 @@ def criar_tabelas():
 def inserir_cliente(cliente): 
    """Insere um objeto Cliente e seu endereço no banco de dados.""" 
    conexao = conectar() 
-   cursor = conexao.cursor() 
-    
-   try: 
+   cursor = conexao.cursor()
+
+   try:
        # Acessamos os dados usando a sintaxe de objeto (ponto) 
        cursor.execute( 
            "INSERT INTO clientes (codigo, nome) VALUES (?, ?)",  
@@ -55,7 +55,12 @@ def inserir_cliente(cliente):
        return True, "Cliente cadastrado com sucesso no banco de dados." 
         
    except sqlite3.IntegrityError: 
-       return False, "Erro: Já existe um cliente com esse código no banco." 
+       return False, "Erro: Já existe um cliente com esse código no banco."
+   
+   except sqlite3.OperationalError as erro: 
+       # Erro de operação: Banco travado, tabela não existe, falta de permissão... 
+       return False, f"Erro Crítico de Banco de Dados: {erro}"
+   
    finally: 
        conexao.close()
  
