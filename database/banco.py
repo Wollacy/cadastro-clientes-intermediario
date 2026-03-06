@@ -1,7 +1,7 @@
 import sqlite3
 
 def criar_tabelas():
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
 
     # Cria a tabela de clientes

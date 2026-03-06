@@ -10,7 +10,7 @@ def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None):
         print("Erro: O nome do cliente não pode estar vazio.")
         return
 
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
     try:
         # Insere o cliente na tabela clientes
@@ -30,7 +30,7 @@ def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None):
 
 # Função para listar clientes com seus endereços (se houver)
 def listar_clientes():
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
     cursor.execute("""
         SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 
@@ -49,7 +49,7 @@ def listar_clientes():
             print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
 
 def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
 
     # Buscar o cliente pelo código
@@ -99,7 +99,7 @@ def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
 
 # Função para remover um cliente e seu endereço correspondente
 def remover_cliente(codigo):
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
     
     # Remover o endereço antes do cliente para evitar erro de integridade
@@ -117,7 +117,7 @@ def remover_cliente(codigo):
 
 # Função para buscar clientes pelo código ou nome
 def buscar_cliente(termo):
-    conexao = sqlite3.connect("clientes.db")
+    conexao = sqlite3.connect("database/clientes.db")
     cursor = conexao.cursor()
     cursor.execute("""
         SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 
