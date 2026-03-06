@@ -1,32 +1,42 @@
 import sqlite3
 
 # Função para cadastrar um cliente e opcionalmente seu endereço
-def cadastrar_cliente(codigo, nome, rua=None, numero=None, cidade=None):
-    # Validação dos campos obrigatórios
-    if not codigo or not codigo.strip():
-        print("Erro: O código do cliente não pode estar vazio.")
-        return
-    if not nome or not nome.strip():
-        print("Erro: O nome do cliente não pode estar vazio.")
-        return
+def cadastrar_cliente(cliente):
+    # cliente agora é um dicionário. Extraímos os dados usando as chaves:
+   codigo = cliente["codigo"]
+   nome = cliente["nome"]
+   rua = cliente["rua"]
+   numero = cliente["numero"]
+   cidade = cliente["cidade"]
 
-    conexao = sqlite3.connect("database/clientes.db")
-    cursor = conexao.cursor()
-    try:
-        # Insere o cliente na tabela clientes
-        cursor.execute("INSERT INTO clientes (codigo, nome) VALUES (?, ?)", (codigo.strip(), nome.strip()))
+   # Validação dos campos obrigatórios
+   if not codigo:
+       print("Erro: O código do cliente não pode estar vazio.") 
+       return
+   if not nome:
+       print("Erro: O nome do cliente não pode estar vazio.") 
+       return
+
+   conexao = sqlite3.connect("database/clientes.db") 
+   cursor = conexao.cursor() 
+    
+   try: 
+       # Insere o cliente na tabela clientes 
+       cursor.execute("INSERT INTO clientes (codigo, nome) VALUES (?, ?)", (codigo, nome)) 
         
-        # Se o endereço for fornecido, insere na tabela enderecos
-        if rua and numero and cidade:
-            cursor.execute("INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)", 
-                           (codigo.strip(), rua.strip(), numero.strip(), cidade.strip()))
+       # Se o endereço for fornecido (não for None), insere na tabela enderecos 
+       if rua and numero and cidade: 
+           cursor.execute("INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",  
+                          (codigo, rua, numero, cidade)) 
+ 
+       conexao.commit() 
+       print(f"Cliente {codigo} - {nome} cadastrado com sucesso!") 
+        
+   except sqlite3.IntegrityError: 
+       print("Erro: Já existe um cliente com esse código.") 
+   finally: 
+       conexao.close() 
 
-        conexao.commit()
-        print(f"Cliente {codigo} - {nome} cadastrado com sucesso!")
-    except sqlite3.IntegrityError:
-        print("Erro: Já existe um cliente com esse código.")
-    finally:
-        conexao.close()
 
 # Função para listar clientes com seus endereços (se houver)
 def listar_clientes():

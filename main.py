@@ -27,18 +27,22 @@ def main():
         match opcao:
             case "1":
                 print("\nCadastrar Cliente\n")
-                codigo = input("Digite o código do cliente: ")
-                nome = input("Digite o nome do cliente: ")
-
+                novo_cliente = { 
+                   "codigo": input("Digite o código do cliente: ").strip(), 
+                   "nome": input("Digite o nome do cliente: ").strip(), 
+                   "rua": None, 
+                   "numero": None, 
+                   "cidade": None 
+                } 
                 endereco_opcional = input("Deseja cadastrar o endereço? (S/N): ").strip().upper()
 
-                if endereco_opcional == "S":
-                    rua = input("Digite o nome da rua: ")
-                    numero = input("Digite o número: ")
-                    cidade = input("Digite a cidade: ")
-                    funcoes.cadastrar_cliente(codigo, nome, rua, numero, cidade)
-                else:
-                    funcoes.cadastrar_cliente(codigo, nome)
+                if endereco_opcional == "S": 
+                   novo_cliente["rua"] = input("Digite o nome da rua: ").strip() 
+                   novo_cliente["numero"] = input("Digite o número: ").strip() 
+                   novo_cliente["cidade"] = input("Digite a cidade: ").strip() 
+ 
+                # Agora enviamos APENAS UMA variável: a entidade cliente inteira 
+                funcoes.cadastrar_cliente(novo_cliente)
             
             case "2":
                 print("\nListar Clientes\n")
