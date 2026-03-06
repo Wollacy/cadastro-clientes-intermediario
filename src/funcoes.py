@@ -1,44 +1,47 @@
 from database import banco
 import csv
 
+
 # Função para cadastrar um cliente e opcionalmente seu endereço
-def cadastrar_cliente(cliente): 
-   # 1. Regra de Negócio usando os ATRIBUTOS do objeto 
-   if not cliente.codigo: 
-       print("❌ Erro: O código do cliente não pode estar vazio.") 
-       return 
-   if not cliente.nome: 
-       print("❌ Erro: O nome do cliente não pode estar vazio.") 
-       return 
- 
-   # 2. Persistência: Enviamos o objeto inteiro para o banco 
-   sucesso, mensagem = banco.inserir_cliente(cliente) 
- 
-   # 3. Retorno visual 
-   if sucesso: 
-       print(f"✅ Sucesso: {mensagem} ({cliente.nome})") 
-   else: 
-       print(f"⚠️ {mensagem}")
+def cadastrar_cliente(cliente):
+    # 1. Regra de Negócio usando os ATRIBUTOS do objeto
+    if not cliente.codigo:
+        print("❌ Erro: O código do cliente não pode estar vazio.")
+        return
+    if not cliente.nome:
+        print("❌ Erro: O nome do cliente não pode estar vazio.")
+        return
+
+    # 2. Persistência: Enviamos o objeto inteiro para o banco
+    sucesso, mensagem = banco.inserir_cliente(cliente)
+
+    # 3. Retorno visual
+    if sucesso:
+        print(f"✅ Sucesso: {mensagem} ({cliente.nome})")
+    else:
+        print(f"⚠️ {mensagem}")
+
 
 # Função para listar clientes com seus endereços (se houver)
-def listar_clientes(): 
-   # Pede os dados crus para a camada de banco 
-   clientes = banco.listar_todos_clientes() 
-    
-   # Regra de negócio: O que fazer se não houver clientes? 
-   if not clientes: 
-       print("Nenhum cliente cadastrado.") 
-       return 
- 
-   # Formatação e Exibição 
-   print("\nLista de Clientes:") 
-   for codigo, nome, rua, numero, cidade in clientes: 
-       endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado" 
-       print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
+def listar_clientes():
+    # Pede os dados crus para a camada de banco
+    clientes = banco.listar_todos_clientes()
+
+    # Regra de negócio: O que fazer se não houver clientes?
+    if not clientes:
+        print("Nenhum cliente cadastrado.")
+        return
+
+    # Formatação e Exibição
+    print("\nLista de Clientes:")
+    for codigo, nome, rua, numero, cidade in clientes:
+        endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
+        print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
+
 
 def alterar_cliente(cliente_dict):
     codigo = cliente_dict["codigo"]
-    
+
     # 1. Validação (Regra de negócio principal)
     if not codigo:
         print("❌ Erro: O código do cliente é obrigatório para a alteração.")
@@ -46,11 +49,11 @@ def alterar_cliente(cliente_dict):
 
     # 2. Persistência (Envia os dados desempacotados para o banco)
     sucesso, mensagem = banco.atualizar_cliente(
-        codigo, 
-        cliente_dict["novo_nome"], 
-        cliente_dict["rua"], 
-        cliente_dict["numero"], 
-        cliente_dict["cidade"]
+        codigo,
+        cliente_dict["novo_nome"],
+        cliente_dict["rua"],
+        cliente_dict["numero"],
+        cliente_dict["cidade"],
     )
 
     # 3. Exibição / Interface
@@ -58,6 +61,7 @@ def alterar_cliente(cliente_dict):
         print(f"✅ Sucesso: {mensagem}")
     else:
         print(f"⚠️ Erro: {mensagem}")
+
 
 # Função para remover um cliente e seu endereço correspondente
 def remover_cliente(codigo):
@@ -75,6 +79,7 @@ def remover_cliente(codigo):
     else:
         print(f"⚠️ Erro: Cliente com código {codigo} não encontrado no sistema.")
 
+
 def buscar_cliente(termo):
     # 1. Validação
     if not termo.strip():
@@ -88,43 +93,48 @@ def buscar_cliente(termo):
     if clientes:
         print("\n🔍 Clientes encontrados:")
         for codigo, nome, rua, numero, cidade in clientes:
-            endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
+            endereco = (
+                f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
+            )
             print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
     else:
         print(f"⚠️ Nenhum cliente encontrado com o termo: '{termo}'.")
 
-def exportar_relatorio_csv(): 
-   # 1. Pede os dados para a camada de persistência (Banco) 
-   clientes = banco.listar_todos_clientes() 
-    
-   if not clientes: 
-       print("⚠️ Não há clientes cadastrados para exportar.") 
-       return 
- 
-   nome_arquivo = "relatorio_clientes.csv" 
- 
-   try: 
-       # 2. O 'with open' cria o arquivo em modo "w" (write/escrever).  
-       # O newline="" evita linhas em branco extras no Windows. 
-       with open(nome_arquivo, mode="w", newline="", encoding="utf-8") as arquivo_csv: 
-            
-           # Criamos o objeto "escritor" 
-           escritor = csv.writer(arquivo_csv, delimiter=";") 
-            
-           # Escrevemos o cabeçalho (a primeira linha da planilha) 
-           escritor.writerow(["Código", "Nome", "Rua", "Número", "Cidade"]) 
-            
-           # 3. Laço de repetição: para cada cliente, escrevemos uma linha nova 
-           for codigo, nome, rua, numero, cidade in clientes: 
-               # Tratando os valores vazios para não ficar feio na planilha 
-               rua = rua if rua else "N/A" 
-               numero = numero if numero else "N/A" 
-               cidade = cidade if cidade else "N/A" 
-                
-               escritor.writerow([codigo, nome, rua, numero, cidade]) 
-                
-       # O arquivo é fechado automaticamente ao sair do bloco 'with'! 
-       print(f"✅ Sucesso: Relatório '{nome_arquivo}' gerado com sucesso na pasta do projeto!") 
-        
-   except Exception as erro: 
-       print(f"❌ Erro ao tentar gerar o arquivo CSV: {erro}") 
+
+def exportar_relatorio_csv():
+    # 1. Pede os dados para a camada de persistência (Banco)
+    clientes = banco.listar_todos_clientes()
+
+    if not clientes:
+        print("⚠️ Não há clientes cadastrados para exportar.")
+        return
+
+    nome_arquivo = "relatorio_clientes.csv"
+
+    try:
+        # 2. O 'with open' cria o arquivo em modo "w" (write/escrever).
+        # O newline="" evita linhas em branco extras no Windows.
+        with open(nome_arquivo, mode="w", newline="", encoding="utf-8") as arquivo_csv:
+
+            # Criamos o objeto "escritor"
+            escritor = csv.writer(arquivo_csv, delimiter=";")
+
+            # Escrevemos o cabeçalho (a primeira linha da planilha)
+            escritor.writerow(["Código", "Nome", "Rua", "Número", "Cidade"])
+
+            # 3. Laço de repetição: para cada cliente, escrevemos uma linha nova
+            for codigo, nome, rua, numero, cidade in clientes:
+                # Tratando os valores vazios para não ficar feio na planilha
+                rua = rua if rua else "N/A"
+                numero = numero if numero else "N/A"
+                cidade = cidade if cidade else "N/A"
+
+                escritor.writerow([codigo, nome, rua, numero, cidade])
+
+        # O arquivo é fechado automaticamente ao sair do bloco 'with'!
+        print(
+            f"✅ Sucesso: Relatório '{nome_arquivo}' gerado com sucesso na pasta do projeto!"
+        )
+
+    except Exception as erro:
+        print(f"❌ Erro ao tentar gerar o arquivo CSV: {erro}")

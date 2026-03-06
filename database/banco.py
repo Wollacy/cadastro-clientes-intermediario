@@ -1,24 +1,29 @@
 import sqlite3
- 
-# Função centralizada para conectar ao banco 
+
+
+# Função centralizada para conectar ao banco
 def conectar():
-   """Retorna uma conexão com o banco de dados SQLite."""
-   return sqlite3.connect("database/clientes.db")
+    """Retorna uma conexão com o banco de dados SQLite."""
+    return sqlite3.connect("database/clientes.db")
+
 
 def criar_tabelas():
     conexao = conectar()
     cursor = conexao.cursor()
 
     # Cria a tabela de clientes
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS clientes (
             codigo TEXT PRIMARY KEY,
             nome TEXT NOT NULL
         )
-    """)
+    """
+    )
 
     # Cria a tabela de endereços
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS enderecos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cliente_codigo TEXT,
@@ -27,92 +32,103 @@ def criar_tabelas():
             cidade TEXT NOT NULL,
             FOREIGN KEY (cliente_codigo) REFERENCES clientes (codigo)
         )
-    """)
+    """
+    )
 
     conexao.commit()
     conexao.close()
 
-def inserir_cliente(cliente): 
-   """Insere um objeto Cliente e seu endereço no banco de dados.""" 
-   conexao = conectar() 
-   cursor = conexao.cursor()
 
-   try:
-       # Acessamos os dados usando a sintaxe de objeto (ponto) 
-       cursor.execute( 
-           "INSERT INTO clientes (codigo, nome) VALUES (?, ?)",  
-           (cliente.codigo, cliente.nome) 
-       ) 
-        
-       # Usamos a "inteligência" do objeto para saber se ele tem endereço! 
-       if cliente.possui_endereco(): 
-           cursor.execute( 
-               "INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",  
-               (cliente.codigo, cliente.rua, cliente.numero, cliente.cidade) 
-           ) 
- 
-       conexao.commit() 
-       return True, "Cliente cadastrado com sucesso no banco de dados." 
-        
-   except sqlite3.IntegrityError: 
-       return False, "Erro: Já existe um cliente com esse código no banco."
-   
-   except sqlite3.OperationalError as erro: 
-       # Erro de operação: Banco travado, tabela não existe, falta de permissão... 
-       return False, f"Erro Crítico de Banco de Dados: {erro}"
-   
-   finally: 
-       conexao.close()
- 
+def inserir_cliente(cliente):
+    """Insere um objeto Cliente e seu endereço no banco de dados."""
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    try:
+        # Acessamos os dados usando a sintaxe de objeto (ponto)
+        cursor.execute(
+            "INSERT INTO clientes (codigo, nome) VALUES (?, ?)",
+            (cliente.codigo, cliente.nome),
+        )
+
+        # Usamos a "inteligência" do objeto para saber se ele tem endereço!
+        if cliente.possui_endereco():
+            cursor.execute(
+                "INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",
+                (cliente.codigo, cliente.rua, cliente.numero, cliente.cidade),
+            )
+
+        conexao.commit()
+        return True, "Cliente cadastrado com sucesso no banco de dados."
+
+    except sqlite3.IntegrityError:
+        return False, "Erro: Já existe um cliente com esse código no banco."
+
+    except sqlite3.OperationalError as erro:
+        # Erro de operação: Banco travado, tabela não existe, falta de permissão...
+        return False, f"Erro Crítico de Banco de Dados: {erro}"
+
+    finally:
+        conexao.close()
+
+
 def listar_todos_clientes():
-   """Busca e retorna todos os clientes do banco."""
-   conexao = conectar()
-   cursor = conexao.cursor()
-   cursor.execute("""
+    """Busca e retorna todos os clientes do banco."""
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute(
+        """
        SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade
        FROM clientes c
        LEFT JOIN enderecos e ON c.codigo = e.cliente_codigo
-   """)
-   clientes = cursor.fetchall()
-   conexao.close()
+   """
+    )
+    clientes = cursor.fetchall()
+    conexao.close()
 
-   return clientes # Retorna os dados crus (lista de tuplas)
+    return clientes  # Retorna os dados crus (lista de tuplas)
+
 
 def deletar_cliente(codigo):
     """Remove um cliente e seu endereço do banco de dados."""
     conexao = conectar()
     cursor = conexao.cursor()
-    
+
     # Remover o endereço antes do cliente para evitar erro de integridade no banco
     cursor.execute("DELETE FROM enderecos WHERE cliente_codigo = ?", (codigo,))
     cursor.execute("DELETE FROM clientes WHERE codigo = ?", (codigo,))
-    
+
     # O rowcount nos diz quantas linhas foram apagadas
-    linhas_afetadas = cursor.rowcount 
-    
+    linhas_afetadas = cursor.rowcount
+
     conexao.commit()
     conexao.close()
 
     # Se apagou 1 ou mais linhas, retorna True (sucesso). Se apagou 0, retorna False.
     return linhas_afetadas > 0
 
+
 def buscar_cliente(termo):
     """Busca clientes por código ou parte do nome e retorna os dados brutos."""
     conexao = conectar()
     cursor = conexao.cursor()
-    
-    cursor.execute("""
+
+    cursor.execute(
+        """
         SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 
         FROM clientes c 
         LEFT JOIN enderecos e ON c.codigo = e.cliente_codigo
         WHERE c.codigo = ? OR c.nome LIKE ?
-    """, (termo, f"%{termo}%"))
-    
+    """,
+        (termo, f"%{termo}%"),
+    )
+
     clientes = cursor.fetchall()
     conexao.close()
 
     # Retorna a lista de tuplas (vazia se não achar ninguém, ou com os dados se achar)
     return clientes
+
 
 def atualizar_cliente(codigo, novo_nome, rua, numero, cidade):
     """Atualiza os dados de um cliente e seu endereço no banco."""
@@ -132,7 +148,9 @@ def atualizar_cliente(codigo, novo_nome, rua, numero, cidade):
     nome_final = novo_nome if novo_nome else nome_atual
 
     # Atualiza o nome na tabela clientes
-    cursor.execute("UPDATE clientes SET nome = ? WHERE codigo = ?", (nome_final, codigo))
+    cursor.execute(
+        "UPDATE clientes SET nome = ? WHERE codigo = ?", (nome_final, codigo)
+    )
 
     # 2. Lógica do endereço
     if rua or numero or cidade:
@@ -141,25 +159,34 @@ def atualizar_cliente(codigo, novo_nome, rua, numero, cidade):
 
         if endereco:
             # Já tem endereço, então atualiza (usando COALESCE para ignorar os vazios)
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE enderecos 
                 SET rua = COALESCE(?, rua), 
                     numero = COALESCE(?, numero), 
                     cidade = COALESCE(?, cidade) 
                 WHERE cliente_codigo = ?
-            """, (rua, numero, cidade, codigo))
+            """,
+                (rua, numero, cidade, codigo),
+            )
         else:
             # Não tem endereço, tenta inserir um novo
             if rua and numero and cidade:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) 
                     VALUES (?, ?, ?, ?)
-                """, (codigo, rua, numero, cidade))
+                """,
+                    (codigo, rua, numero, cidade),
+                )
             else:
                 conexao.close()
-                return False, "Para cadastrar um novo endereço, todos os campos (rua, num, cid) devem ser fornecidos."
+                return (
+                    False,
+                    "Para cadastrar um novo endereço, todos os campos (rua, num, cid) devem ser fornecidos.",
+                )
 
     conexao.commit()
     conexao.close()
-    
+
     return True, f"Cliente {codigo} atualizado com sucesso!"

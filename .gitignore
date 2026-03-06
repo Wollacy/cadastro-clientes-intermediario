@@ -1,0 +1,11 @@
+# Ignora arquivos de banco de dados SQLite 
+*.db 
+database/*.db 
+ 
+# Ignora relatórios e planilhas geradas 
+*.csv 
+relatorio_clientes.csv 
+ 
+# Ignora pastas de cache nativas do Python 
+__pycache__/ 
+*.pyc
