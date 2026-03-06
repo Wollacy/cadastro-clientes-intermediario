@@ -1,4 +1,3 @@
-import sqlite3
 from database import banco
 
 # Função para cadastrar um cliente e opcionalmente seu endereço
@@ -21,27 +20,23 @@ def cadastrar_cliente(cliente):
        print(f"⚠️ {mensagem}")
 
 # Função para listar clientes com seus endereços (se houver)
-def listar_clientes():
-    conexao = sqlite3.connect("database/clientes.db")
-    cursor = conexao.cursor()
-    cursor.execute("""
-        SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 
-        FROM clientes c 
-        LEFT JOIN enderecos e ON c.codigo = e.cliente_codigo
-    """)
-    clientes = cursor.fetchall()
-    conexao.close()
+def listar_clientes(): 
+   # Pede os dados crus para a camada de banco 
+   clientes = banco.listar_todos_clientes() 
     
-    if not clientes:
-        print("Nenhum cliente cadastrado.")
-    else:
-        print("\nLista de Clientes:")
-        for codigo, nome, rua, numero, cidade in clientes:
-            endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado"
-            print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
+   # Regra de negócio: O que fazer se não houver clientes? 
+   if not clientes: 
+       print("Nenhum cliente cadastrado.") 
+       return 
+ 
+   # Formatação e Exibição 
+   print("\nLista de Clientes:") 
+   for codigo, nome, rua, numero, cidade in clientes: 
+       endereco = f"{rua}, {numero} - {cidade}" if rua else "Sem endereço cadastrado" 
+       print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
 
 def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
-    conexao = sqlite3.connect("database/clientes.db")
+    conexao = banco.conectar()
     cursor = conexao.cursor()
 
     # Buscar o cliente pelo código
@@ -91,7 +86,7 @@ def alterar_cliente(codigo, novo_nome=None, rua=None, numero=None, cidade=None):
 
 # Função para remover um cliente e seu endereço correspondente
 def remover_cliente(codigo):
-    conexao = sqlite3.connect("database/clientes.db")
+    conexao = banco.conectar()
     cursor = conexao.cursor()
     
     # Remover o endereço antes do cliente para evitar erro de integridade
@@ -109,7 +104,7 @@ def remover_cliente(codigo):
 
 # Função para buscar clientes pelo código ou nome
 def buscar_cliente(termo):
-    conexao = sqlite3.connect("database/clientes.db")
+    conexao = banco.conectar()
     cursor = conexao.cursor()
     cursor.execute("""
         SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade 

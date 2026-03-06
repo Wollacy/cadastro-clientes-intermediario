@@ -59,3 +59,16 @@ def inserir_cliente(cliente):
    finally:
        conexao.close()
  
+def listar_todos_clientes():
+   """Busca e retorna todos os clientes do banco."""
+   conexao = conectar()
+   cursor = conexao.cursor()
+   cursor.execute("""
+       SELECT c.codigo, c.nome, e.rua, e.numero, e.cidade
+       FROM clientes c
+       LEFT JOIN enderecos e ON c.codigo = e.cliente_codigo
+   """)
+   clientes = cursor.fetchall()
+   conexao.close()
+   
+   return clientes # Retorna os dados crus (lista de tuplas)
