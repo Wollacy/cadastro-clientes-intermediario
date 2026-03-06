@@ -32,31 +32,31 @@ def criar_tabelas():
     conexao.commit()
     conexao.close()
 
-def inserir_cliente(cliente):
-   """Insere um novo cliente e seu endereço no banco de dados."""
-   conexao = conectar()
-   cursor = conexao.cursor()
-
-   try:
-       # Insere na tabela clientes
-       cursor.execute(
-           "INSERT INTO clientes (codigo, nome) VALUES (?, ?)",
-           (cliente["codigo"], cliente["nome"])
-       )
-
-       # Insere na tabela enderecos se houver dados
-       if cliente["rua"] and cliente["numero"] and cliente["cidade"]:
-           cursor.execute(
-               "INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",
-               (cliente["codigo"], cliente["rua"], cliente["numero"], cliente["cidade"])
-           )
-
-       conexao.commit()
-       return True, "Cliente cadastrado com sucesso no banco de dados."
-   
-   except sqlite3.IntegrityError:
-       return False, "Erro: Já existe um cliente com esse código no banco."
-   finally:
+def inserir_cliente(cliente): 
+   """Insere um objeto Cliente e seu endereço no banco de dados.""" 
+   conexao = conectar() 
+   cursor = conexao.cursor() 
+    
+   try: 
+       # Acessamos os dados usando a sintaxe de objeto (ponto) 
+       cursor.execute( 
+           "INSERT INTO clientes (codigo, nome) VALUES (?, ?)",  
+           (cliente.codigo, cliente.nome) 
+       ) 
+        
+       # Usamos a "inteligência" do objeto para saber se ele tem endereço! 
+       if cliente.possui_endereco(): 
+           cursor.execute( 
+               "INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",  
+               (cliente.codigo, cliente.rua, cliente.numero, cliente.cidade) 
+           ) 
+ 
+       conexao.commit() 
+       return True, "Cliente cadastrado com sucesso no banco de dados." 
+        
+   except sqlite3.IntegrityError: 
+       return False, "Erro: Já existe um cliente com esse código no banco." 
+   finally: 
        conexao.close()
  
 def listar_todos_clientes():

@@ -1,22 +1,22 @@
 from database import banco
 
 # Função para cadastrar um cliente e opcionalmente seu endereço
-def cadastrar_cliente(cliente):
-   # 1. Regra de Negócio: Validação dos campos obrigatórios
-   if not cliente["codigo"]:
-       print("❌ Erro: O código do cliente não pode estar vazio.")
-       return
-   if not cliente["nome"]:
-       print("❌ Erro: O nome do cliente não pode estar vazio.")
-       return
-   
-   # 2. Persistência: Passamos a bola para o banco.py fazer o trabalho sujo de SQL
-   sucesso, mensagem = banco.inserir_cliente(cliente)
-
-   # 3. Retorno visual para o usuário
-   if sucesso:
-       print(f"✅ Sucesso: {mensagem} ({cliente['nome']})")
-   else:
+def cadastrar_cliente(cliente): 
+   # 1. Regra de Negócio usando os ATRIBUTOS do objeto 
+   if not cliente.codigo: 
+       print("❌ Erro: O código do cliente não pode estar vazio.") 
+       return 
+   if not cliente.nome: 
+       print("❌ Erro: O nome do cliente não pode estar vazio.") 
+       return 
+ 
+   # 2. Persistência: Enviamos o objeto inteiro para o banco 
+   sucesso, mensagem = banco.inserir_cliente(cliente) 
+ 
+   # 3. Retorno visual 
+   if sucesso: 
+       print(f"✅ Sucesso: {mensagem} ({cliente.nome})") 
+   else: 
        print(f"⚠️ {mensagem}")
 
 # Função para listar clientes com seus endereços (se houver)

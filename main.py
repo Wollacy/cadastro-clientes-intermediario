@@ -1,5 +1,6 @@
 from database import banco
 from src import funcoes
+from src.models import Cliente
 
 def exibir_menu():
    """Função auxiliar apenas para imprimir as opções na tela."""
@@ -25,24 +26,26 @@ def main():
         opcao = input("Escolha uma opção: ")
 
         match opcao:
-            case "1":
-                print("\nCadastrar Cliente\n")
-                novo_cliente = { 
-                   "codigo": input("Digite o código do cliente: ").strip(), 
-                   "nome": input("Digite o nome do cliente: ").strip(), 
-                   "rua": None, 
-                   "numero": None, 
-                   "cidade": None 
-                } 
-                endereco_opcional = input("Deseja cadastrar o endereço? (S/N): ").strip().upper()
-
-                if endereco_opcional == "S": 
-                   novo_cliente["rua"] = input("Digite o nome da rua: ").strip() 
-                   novo_cliente["numero"] = input("Digite o número: ").strip() 
-                   novo_cliente["cidade"] = input("Digite a cidade: ").strip() 
+            case "1": 
+               print("\n[ Cadastrar Cliente ]") 
+               codigo = input("Digite o código do cliente: ").strip() 
+               nome = input("Digite o nome do cliente: ").strip() 
+                
+               endereco_opcional = input("Deseja cadastrar o endereço? (S/N): ").strip().upper() 
  
-                # Agora enviamos APENAS UMA variável: a entidade cliente inteira 
-                funcoes.cadastrar_cliente(novo_cliente)
+               if endereco_opcional == "S": 
+                   rua = input("Digite o nome da rua: ").strip() 
+                   numero = input("Digite o número: ").strip() 
+                   cidade = input("Digite a cidade: ").strip() 
+                   # Fabricando o objeto COMPLETO 
+                   novo_cliente = Cliente(codigo, nome, rua, numero, cidade) 
+               else: 
+                   # Fabricando o objeto apenas com os dados básicos 
+                   novo_cliente = Cliente(codigo, nome) 
+ 
+               # Enviamos o OBJETO para as regras de negócio 
+               funcoes.cadastrar_cliente(novo_cliente) 
+
             
             case "2":
                 print("\nListar Clientes\n")
