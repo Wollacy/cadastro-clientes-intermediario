@@ -1,42 +1,24 @@
 import sqlite3
+from database import banco
 
 # Função para cadastrar um cliente e opcionalmente seu endereço
 def cadastrar_cliente(cliente):
-    # cliente agora é um dicionário. Extraímos os dados usando as chaves:
-   codigo = cliente["codigo"]
-   nome = cliente["nome"]
-   rua = cliente["rua"]
-   numero = cliente["numero"]
-   cidade = cliente["cidade"]
-
-   # Validação dos campos obrigatórios
-   if not codigo:
-       print("Erro: O código do cliente não pode estar vazio.") 
+   # 1. Regra de Negócio: Validação dos campos obrigatórios
+   if not cliente["codigo"]:
+       print("❌ Erro: O código do cliente não pode estar vazio.")
        return
-   if not nome:
-       print("Erro: O nome do cliente não pode estar vazio.") 
+   if not cliente["nome"]:
+       print("❌ Erro: O nome do cliente não pode estar vazio.")
        return
+   
+   # 2. Persistência: Passamos a bola para o banco.py fazer o trabalho sujo de SQL
+   sucesso, mensagem = banco.inserir_cliente(cliente)
 
-   conexao = sqlite3.connect("database/clientes.db") 
-   cursor = conexao.cursor() 
-    
-   try: 
-       # Insere o cliente na tabela clientes 
-       cursor.execute("INSERT INTO clientes (codigo, nome) VALUES (?, ?)", (codigo, nome)) 
-        
-       # Se o endereço for fornecido (não for None), insere na tabela enderecos 
-       if rua and numero and cidade: 
-           cursor.execute("INSERT INTO enderecos (cliente_codigo, rua, numero, cidade) VALUES (?, ?, ?, ?)",  
-                          (codigo, rua, numero, cidade)) 
- 
-       conexao.commit() 
-       print(f"Cliente {codigo} - {nome} cadastrado com sucesso!") 
-        
-   except sqlite3.IntegrityError: 
-       print("Erro: Já existe um cliente com esse código.") 
-   finally: 
-       conexao.close() 
-
+   # 3. Retorno visual para o usuário
+   if sucesso:
+       print(f"✅ Sucesso: {mensagem} ({cliente['nome']})")
+   else:
+       print(f"⚠️ {mensagem}")
 
 # Função para listar clientes com seus endereços (se houver)
 def listar_clientes():
