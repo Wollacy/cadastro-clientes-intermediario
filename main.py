@@ -12,6 +12,7 @@ def exibir_menu():
    print("3. Alterar cliente")
    print("4. Remover cliente")
    print("5. Buscar cliente")
+   print("6. Exportar Relatório CSV") 
    print("0. Sair")
    print("="*20)
 
@@ -84,6 +85,11 @@ def main():
                     print("\nBuscar Cliente\n")
                     termo = input("Digite o código ou nome do cliente: ")
                     funcoes.buscar_cliente(termo)
+
+                case "6": 
+                    print("\n[ Gerar Relatório CSV ]") 
+                    print("Extraindo dados do banco...") 
+                    funcoes.exportar_relatorio_csv()
 
                 case "0":
                     print("\nSaindo do sistema. Até mais!\n")

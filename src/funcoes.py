@@ -1,4 +1,5 @@
 from database import banco
+import csv
 
 # Função para cadastrar um cliente e opcionalmente seu endereço
 def cadastrar_cliente(cliente): 
@@ -91,3 +92,39 @@ def buscar_cliente(termo):
             print(f"Código: {codigo} - Nome: {nome} - Endereço: {endereco}")
     else:
         print(f"⚠️ Nenhum cliente encontrado com o termo: '{termo}'.")
+
+def exportar_relatorio_csv(): 
+   # 1. Pede os dados para a camada de persistência (Banco) 
+   clientes = banco.listar_todos_clientes() 
+    
+   if not clientes: 
+       print("⚠️ Não há clientes cadastrados para exportar.") 
+       return 
+ 
+   nome_arquivo = "relatorio_clientes.csv" 
+ 
+   try: 
+       # 2. O 'with open' cria o arquivo em modo "w" (write/escrever).  
+       # O newline="" evita linhas em branco extras no Windows. 
+       with open(nome_arquivo, mode="w", newline="", encoding="utf-8") as arquivo_csv: 
+            
+           # Criamos o objeto "escritor" 
+           escritor = csv.writer(arquivo_csv, delimiter=";") 
+            
+           # Escrevemos o cabeçalho (a primeira linha da planilha) 
+           escritor.writerow(["Código", "Nome", "Rua", "Número", "Cidade"]) 
+            
+           # 3. Laço de repetição: para cada cliente, escrevemos uma linha nova 
+           for codigo, nome, rua, numero, cidade in clientes: 
+               # Tratando os valores vazios para não ficar feio na planilha 
+               rua = rua if rua else "N/A" 
+               numero = numero if numero else "N/A" 
+               cidade = cidade if cidade else "N/A" 
+                
+               escritor.writerow([codigo, nome, rua, numero, cidade]) 
+                
+       # O arquivo é fechado automaticamente ao sair do bloco 'with'! 
+       print(f"✅ Sucesso: Relatório '{nome_arquivo}' gerado com sucesso na pasta do projeto!") 
+        
+   except Exception as erro: 
+       print(f"❌ Erro ao tentar gerar o arquivo CSV: {erro}") 
